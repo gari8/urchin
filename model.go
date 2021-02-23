@@ -23,3 +23,8 @@ type Query struct {
 	QBody *string `yaml:"q_body"`
 	QFile *string `yaml:"q_file"`
 }
+
+type Content struct {
+	SubCmd string
+	FilePath *string
+}
