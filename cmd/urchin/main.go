@@ -1,10 +1,8 @@
 package main
 
 import (
-	"errors"
 	"flag"
 	"github.com/gari8/urchin"
-	"log"
 )
 
 
@@ -21,8 +19,10 @@ func main() {
 		content.Work()
 	case "init":
 		content.Create()
+	case "help":
+		content.Help()
 	default:
-		log.Fatal(errors.New("usage text"))
+		content.Usage()
 	}
 }
 

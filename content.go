@@ -12,7 +12,27 @@ const fileName = "urchin.yml"
 const notExist = `
 The specified path is incorrect or the urchin file does not exist.
 
--h or help
+please refer to the text displayed after entering the help subcommand.
+`
+const usageText = `
+subcommand is not detected.
+please refer to the text displayed after entering the help subcommand.
+`
+const helpText = `
+* creating urchin.yml template
+urchin init
+
+* execute urchin by your urchin.yml
+urchin work <your urchin.yml path>
+
+* showing this help-message again
+urchin help
+
+* referring to the website
+please enter: https://github.com/gari8/urchin
+
+* getting newer version
+go get -u github.com/gari8/urchin/cmd/urchin
 `
 const templates = `tasks:
   - task_name: "sample"
@@ -72,4 +92,12 @@ func (c *Content) Create() {
 	}
 
 	fmt.Println("create: "+fileName)
+}
+
+func (c *Content) Usage() {
+	fmt.Print(usageText)
+}
+
+func (c *Content) Help() {
+	fmt.Print(helpText)
 }
