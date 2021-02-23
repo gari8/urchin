@@ -8,6 +8,7 @@ import (
 	"gopkg.in/yaml.v2"
 	"io/ioutil"
 	"log"
+	"os"
 )
 
 type Content struct {
@@ -32,6 +33,7 @@ func main() {
 	}
 }
 
+const fileName = "urchin.yml"
 const notExist = `
 The specified path is incorrect or the urchin file does not exist.
 
@@ -43,7 +45,7 @@ func (c *Content) work() {
 		fmt.Print(notExist)
 		return
 	}
-	buf, err := ioutil.ReadFile(*c.FilePath+"/urchin.yml")
+	buf, err := ioutil.ReadFile(*c.FilePath+"/"+fileName)
 	if err != nil {
 		fmt.Print(notExist)
 		return
@@ -65,5 +67,22 @@ func (c *Content) work() {
 }
 
 func (c *Content) create() {
-	fmt.Println("create MODE")
+	bytes, err := ioutil.ReadFile("_templates/"+fileName)
+	if err != nil {
+		panic(err)
+	}
+
+	text := string(bytes)
+
+	file, err := os.Create(fileName)
+	if err != nil {
+		panic(err)
+	}
+	defer file.Close()
+
+	if _, err = file.WriteString(text); err != nil {
+		panic(err)
+	}
+
+	fmt.Println("create: "+fileName)
 }
