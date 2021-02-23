@@ -16,5 +16,5 @@ tasks:
         q_body: "2"
       - q_name: "title2"
         q_body: "sample2"
-task_interval: 30
-max_trial_count: 10
+task_interval: 3
+max_trial_count: 5

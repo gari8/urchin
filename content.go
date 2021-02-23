@@ -4,8 +4,9 @@ import (
 	"fmt"
 	"gopkg.in/yaml.v2"
 	"io/ioutil"
-	"log"
 	"os"
+	"strconv"
+	"time"
 )
 
 const fileName = "urchin.yml"
@@ -16,13 +17,19 @@ please refer to the text displayed after entering the help subcommand.
 `
 const usageText = `
 subcommand is not detected.
+
+please refer to the text displayed after entering the help subcommand.
+`
+const invalidFile = `
+your urchin.yml is invalid.
+
 please refer to the text displayed after entering the help subcommand.
 `
 const helpText = `
 * creating urchin.yml template
 urchin init
 
-* execute urchin by your urchin.yml
+* executing urchin by your urchin.yml
 urchin work <your urchin.yml path>
 
 * showing this help-message again
@@ -52,23 +59,53 @@ const templates = `tasks:
         q_body: "2"
       - q_name: "title2"
         q_body: "sample2"
+task_interval: 30
+max_trial_count: 10
 `
+const boundaryText = "** -------------------- ** boundary ** -------------------- **"
 
 func (c *Content) Work() {
 	if c.FilePath == nil {
-		fmt.Print(notExist)
+		fmt.Printf("\x1b[33m%s\x1b[0m\n", notExist)
 		return
 	}
+
 	buf, err := ioutil.ReadFile(*c.FilePath+"/"+fileName)
 	if err != nil {
-		fmt.Print(notExist)
+		fmt.Printf("\x1b[33m%s\x1b[0m\n", notExist)
 		return
 	}
 
 	var data Data
 	if err = yaml.Unmarshal(buf, &data); err != nil {
-		log.Fatal(err)
+		fmt.Printf("\x1b[33m%s\x1b[0m\n", invalidFile)
+		return
 	}
+
+	if data.TaskInterval != nil {
+		index := 1
+		ticker := time.NewTicker(time.Millisecond * time.Duration(*data.TaskInterval*1000))
+		defer ticker.Stop()
+		taskRunner(data)
+		for {
+			select {
+			case <-ticker.C:
+				fmt.Printf("\x1b[36m%s\x1b[0m\n", boundaryText)
+				taskRunner(data)
+				index++
+				if index == *data.MaxTrialCnt {
+					fmt.Printf("\x1b[32m%s\x1b[0m\n", "Task completed " + strconv.Itoa(index) + " times in total " + "(" + strconv.Itoa(index*(*data.TaskInterval)) + "s)")
+					return
+				}
+			}
+		}
+	} else {
+		taskRunner(data)
+	}
+}
+
+func taskRunner(data Data) {
+	fmt.Println("")
 	for _, task := range data.Tasks {
 		if task.TrialCnt != nil {
 			for i:=0; i<*task.TrialCnt; i++ {
@@ -78,6 +115,7 @@ func (c *Content) Work() {
 			task.Exe()
 		}
 	}
+	fmt.Println("")
 }
 
 func (c *Content) Create() {
@@ -91,13 +129,13 @@ func (c *Content) Create() {
 		panic(err)
 	}
 
-	fmt.Println("create: "+fileName)
+	fmt.Printf("\x1b[32m%s\x1b[0m\n", "create: "+fileName)
 }
 
 func (c *Content) Usage() {
-	fmt.Print(usageText)
+	fmt.Printf("\x1b[33m%s\x1b[0m\n", usageText)
 }
 
 func (c *Content) Help() {
-	fmt.Print(helpText)
+	fmt.Printf("\x1b[35m%s\x1b[0m\n", helpText)
 }

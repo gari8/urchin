@@ -2,6 +2,8 @@ package urchin
 
 type Data struct {
 	Tasks []Task `yaml:"tasks"`
+	TaskInterval *int `yaml:"task_interval"`
+	MaxTrialCnt *int `yaml:"max_trial_count"`
 }
 
 type Task struct {
