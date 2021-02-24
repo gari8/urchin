@@ -18,9 +18,9 @@ urchin work .
 
 ## How to write
 
-* = must
-
 ```urchin.yml
+#(*) = must
+
 tasks:
   - task_name: "" #(*)
     server_url: "" #(*)
