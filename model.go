@@ -13,8 +13,14 @@ type Task struct {
 	ContentType *string `yaml:"content_type"`
 	TrialCnt *int `yaml:"trial_count"`
 	QJson *string `yaml:"q_json"`
+	BasicAuth *Auth `yaml:"basic_auth"`
 	Queries []*Query
 	Headers []*Header
+}
+
+type Auth struct {
+	UserName string `yaml:"user_name"`
+	Password string `yaml:"password"`
 }
 
 type Header struct {

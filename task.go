@@ -57,7 +57,7 @@ func (t *Task) get() (*string, error) {
 		params.Add(*q.QName, *q.QBody)
 	}
 
-	return clientEvent(req)
+	return t.clientEvent(req)
 }
 
 func fileReader(fileName string) ([]byte, error) {
@@ -103,7 +103,7 @@ func (t *Task) postForm() (*string, error) {
 		req.Header.Set(*h.HType, *h.HBody)
 	}
 
-	return clientEvent(req)
+	return t.clientEvent(req)
 }
 
 func (t *Task) postJson() (*string, error) {
@@ -125,7 +125,7 @@ func (t *Task) postJson() (*string, error) {
 		req.Header.Set(*h.HType, *h.HBody)
 	}
 
-	return clientEvent(req)
+	return t.clientEvent(req)
 }
 
 func (t *Task) postMultipart() (*string, error) {
@@ -160,10 +160,13 @@ func (t *Task) postMultipart() (*string, error) {
 		req.Header.Set(*h.HType, *h.HBody)
 	}
 
-	return clientEvent(req)
+	return t.clientEvent(req)
 }
 
-func clientEvent(req *http.Request) (*string, error) {
+func (t *Task) clientEvent(req *http.Request) (*string, error) {
+	if t.BasicAuth != nil {
+		req.SetBasicAuth(t.BasicAuth.UserName, t.BasicAuth.Password)
+	}
 
 	client := &http.Client{}
 
