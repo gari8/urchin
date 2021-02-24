@@ -13,7 +13,7 @@ import (
 const (
 	multi = "multipart/form-data"
 	appJson = "application/json; charset=UTF-8"
-	formData = "application/x-www-form-urlencoded"
+	formData = "application/x-www-form-urlencoded; charset=UTF-8"
 )
 
 func (t *Task) Exe() (*string, error) {

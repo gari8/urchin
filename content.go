@@ -125,6 +125,8 @@ func taskRunner(data Data) {
 		if task.TrialCnt != nil {
 			for i:=0; i<*task.TrialCnt; i++ {
 				str, err := task.Exe()
+				message := fmt.Sprintf("task_name: %s, server_url: %s, method: %s", task.TaskName, task.ServerURL, task.Method)
+				handlingAny(magenta, message)
 				if err != nil || str == nil {
 					handlingError(err)
 				} else {
@@ -133,6 +135,8 @@ func taskRunner(data Data) {
 			}
 		} else {
 			str, err := task.Exe()
+			message := fmt.Sprintf("task_name: %s, server_url: %s, method: %s", task.TaskName, task.ServerURL, task.Method)
+			handlingAny(magenta, message)
 			if err != nil || str == nil {
 				handlingError(err)
 			} else {
