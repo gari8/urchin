@@ -46,11 +46,11 @@ const templates = `tasks: # must
     server_url: "https://sample.com/xxxx/xxxx" # must
     method: "POST" # must
     trial_count: 2 # 1周で送信する回数
-    queries:
-      - q_name: "user_id"
-        q_body: "1"
-      - q_name: "title"
-        q_body: "sample"
+    content_type: "application/json" # content-typeはこちらにかける
+    q_json: "{ \"user_id\": 1 }" # application/json　の場合jsonを書く
+    headers: # header
+      - h_type: # header名 
+        h_body:
   - task_name: "sample2" # must
     server_url: "https://sample.com/xxxx/xxxx" # must
     method: "POST" # must

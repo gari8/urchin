@@ -14,8 +14,8 @@ type Task struct {
 	TrialCnt *int `yaml:"trial_count"`
 	QJson *string `yaml:"q_json"`
 	BasicAuth *Auth `yaml:"basic_auth"`
-	Queries []*Query
-	Headers []*Header
+	Queries []*Query `yaml:"queries"`
+	Headers []*Header `yaml:"headers"`
 }
 
 type Auth struct {
