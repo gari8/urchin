@@ -54,11 +54,14 @@ const templates = `tasks: # must
   - task_name: "sample2" # must
     server_url: "https://sample.com/xxxx/xxxx" # must
     method: "POST" # must
+    basic_auth: # basic認証
+      user_name: "user_1" # basic_auth がある場合 must
+      password: "******" # basic_auth がある場合 must
     queries:
       - q_name: "user_id"
         q_body: "2"
       - q_name: "title2"
-        q_file: "./index.html" # text file を読み込んで送信 
+        q_file: "./index.html" # text file を読み込んで送信
 task_interval: 3 # インターバルの秒数(s)　指定しなければ1周のみ
 max_trial_count: 5 # 合計何周するか　指定しなければ止めるまでループ
 `
