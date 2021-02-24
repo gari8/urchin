@@ -10,14 +10,16 @@ type Task struct {
 	TaskName string `yaml:"task_name"`
 	ServerURL string `yaml:"server_url"`
 	Method string `yaml:"method"`
-	ContentType string `yaml:"content_type"`
+	ContentType *string `yaml:"content_type"`
 	TrialCnt *int `yaml:"trial_count"`
-	Queries []Query
-	Headers []Header
+	QJson *string `yaml:"q_json"`
+	Queries []*Query
+	Headers []*Header
 }
 
 type Header struct {
-	HType string `yaml:"h_type"`
+	HType *string `yaml:"h_type"`
+	HBody *string `yaml:"h_body"`
 }
 
 type Query struct {

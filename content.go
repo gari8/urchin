@@ -41,44 +41,56 @@ please enter: https://github.com/gari8/urchin
 * getting newer version
 go get -u github.com/gari8/urchin/cmd/urchin
 `
-const templates = `tasks:
-  - task_name: "sample"
-    server_url: "https://sample.com/xxxx/xxxx"
-    method: "POST"
-    trial_count: 2
+const templates = `tasks: # must
+  - task_name: "sample" # must
+    server_url: "https://sample.com/xxxx/xxxx" # must
+    method: "POST" # must
+    trial_count: 2 # 1周で送信する回数
     queries:
       - q_name: "user_id"
         q_body: "1"
       - q_name: "title"
         q_body: "sample"
-  - task_name: "sample2"
-    server_url: "https://sample.com/xxxx/xxxx"
-    method: "POST"
+  - task_name: "sample2" # must
+    server_url: "https://sample.com/xxxx/xxxx" # must
+    method: "POST" # must
     queries:
       - q_name: "user_id"
         q_body: "2"
       - q_name: "title2"
-        q_body: "sample2"
-task_interval: 30
-max_trial_count: 10
+        q_file: "./index.html" # text file を読み込んで送信 
+task_interval: 3 # インターバルの秒数(s)　指定しなければ1周のみ
+max_trial_count: 5 # 合計何周するか　指定しなければ止めるまでループ
 `
 const boundaryText = "** -------------------- ** boundary ** -------------------- **"
 
+const (
+	black = iota + 30
+	red
+	green
+	yellow
+	blue
+	magenta
+	cyan
+	white
+)
+
 func (c *Content) Work() {
 	if c.FilePath == nil {
-		fmt.Printf("\x1b[33m%s\x1b[0m\n", notExist)
+		handlingWarning(notExist)
 		return
 	}
 
 	buf, err := ioutil.ReadFile(*c.FilePath+"/"+fileName)
 	if err != nil {
-		fmt.Printf("\x1b[33m%s\x1b[0m\n", notExist)
+		handlingWarning(notExist)
 		return
 	}
 
 	var data Data
 	if err = yaml.Unmarshal(buf, &data); err != nil {
-		fmt.Printf("\x1b[33m%s\x1b[0m\n", invalidFile)
+		// yml側の問題なのでwarning
+		handlingWarning(invalidFile)
 		return
 	}
 
@@ -90,11 +102,11 @@ func (c *Content) Work() {
 		for {
 			select {
 			case <-ticker.C:
-				fmt.Printf("\x1b[36m%s\x1b[0m\n", boundaryText)
+				handlingAny(cyan, boundaryText)
 				taskRunner(data)
 				index++
-				if index == *data.MaxTrialCnt {
-					fmt.Printf("\x1b[32m%s\x1b[0m\n", "Task completed " + strconv.Itoa(index) + " times in total " + "(" + strconv.Itoa(index*(*data.TaskInterval)) + "s)")
+				if data.MaxTrialCnt != nil && index == *data.MaxTrialCnt {
+					handlingSuccess("Task completed " + strconv.Itoa(index) + " times in total " + "(" + strconv.Itoa(index*(*data.TaskInterval)) + "s)")
 					return
 				}
 			}
@@ -109,10 +121,20 @@ func taskRunner(data Data) {
 	for _, task := range data.Tasks {
 		if task.TrialCnt != nil {
 			for i:=0; i<*task.TrialCnt; i++ {
-				task.Exe()
+				str, err := task.Exe()
+				if err != nil || str == nil {
+					handlingError(err)
+				} else {
+					handlingAny(cyan, *str)
+				}
 			}
 		} else {
-			task.Exe()
+			str, err := task.Exe()
+			if err != nil || str == nil {
+				handlingError(err)
+			} else {
+				handlingAny(cyan, *str)
+			}
 		}
 	}
 	fmt.Println("")
@@ -126,16 +148,31 @@ func (c *Content) Create() {
 	defer file.Close()
 
 	if _, err = file.WriteString(templates); err != nil {
-		panic(err)
+		handlingError(err)
 	}
-
-	fmt.Printf("\x1b[32m%s\x1b[0m\n", "create: "+fileName)
+	handlingSuccess("create: "+fileName)
 }
 
 func (c *Content) Usage() {
-	fmt.Printf("\x1b[33m%s\x1b[0m\n", usageText)
+	handlingWarning(usageText)
 }
 
 func (c *Content) Help() {
-	fmt.Printf("\x1b[35m%s\x1b[0m\n", helpText)
+	handlingAny(magenta, helpText)
+}
+
+func handlingError(err error) {
+	fmt.Printf("\x1b[%dm%s\x1b[0m\n", red, err)
+}
+
+func handlingWarning(str string) {
+	fmt.Printf("\x1b[%dm%s\x1b[0m\n", yellow, str)
+}
+
+func handlingSuccess(str string) {
+	fmt.Printf("\x1b[%dm%s\x1b[0m\n", green, str)
+}
+
+func handlingAny(number int, str string) {
+	fmt.Printf("\x1b[%dm%s\x1b[0m\n", number, str)
 }
