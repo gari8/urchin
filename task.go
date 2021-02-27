@@ -3,6 +3,7 @@ package urchin
 import (
 	"bytes"
 	"errors"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 	"net/url"
@@ -85,7 +86,8 @@ func (t *Task) postForm() (*string, error) {
 			if err != nil {
 				return nil, err
 			}
-			values.Add(*q.QName, string(byte))
+			str := fmt.Sprintf("%s", byte)
+			values.Add(*q.QName, str)
 		} else {
 			values.Add(*q.QName, *q.QBody)
 		}
