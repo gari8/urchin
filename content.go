@@ -122,7 +122,7 @@ func (c *Content) Work() {
 func taskRunner(data Data) {
 	fmt.Println("")
 	for _, task := range data.Tasks {
-		go func (task *Task) {
+		go func (task Task) {
 			if task.TrialCnt != nil {
 				for i:=0; i<*task.TrialCnt; i++ {
 					str, err := task.Exe()
@@ -144,7 +144,7 @@ func taskRunner(data Data) {
 					handlingAny(cyan, *str)
 				}
 			}
-		} (&task)
+		} (task)
 	}
 	fmt.Println("")
 }
