@@ -105,7 +105,6 @@ func (c *Content) Work() {
 		for {
 			select {
 			case <-ticker.C:
-				handlingAny(cyan, boundaryText)
 				taskRunner(data)
 				index++
 				if data.MaxTrialCnt != nil && index == *data.MaxTrialCnt {
@@ -122,6 +121,7 @@ func (c *Content) Work() {
 func taskRunner(data Data) {
 	fmt.Println("")
 	for _, task := range data.Tasks {
+		handlingAny(magenta, fmt.Sprintf("sent a request to task: %s", task.TaskName))
 		go func (task Task) {
 			if task.TrialCnt != nil {
 				for i:=0; i<*task.TrialCnt; i++ {
