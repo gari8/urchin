@@ -122,8 +122,19 @@ func (c *Content) Work() {
 func taskRunner(data Data) {
 	fmt.Println("")
 	for _, task := range data.Tasks {
-		if task.TrialCnt != nil {
-			for i:=0; i<*task.TrialCnt; i++ {
+		go func (task *Task) {
+			if task.TrialCnt != nil {
+				for i:=0; i<*task.TrialCnt; i++ {
+					str, err := task.Exe()
+					message := fmt.Sprintf("task_name: %s, server_url: %s, method: %s", task.TaskName, task.ServerURL, task.Method)
+					handlingAny(magenta, message)
+					if err != nil || str == nil {
+						handlingError(err)
+					} else {
+						handlingAny(cyan, *str)
+					}
+				}
+			} else {
 				str, err := task.Exe()
 				message := fmt.Sprintf("task_name: %s, server_url: %s, method: %s", task.TaskName, task.ServerURL, task.Method)
 				handlingAny(magenta, message)
@@ -133,16 +144,7 @@ func taskRunner(data Data) {
 					handlingAny(cyan, *str)
 				}
 			}
-		} else {
-			str, err := task.Exe()
-			message := fmt.Sprintf("task_name: %s, server_url: %s, method: %s", task.TaskName, task.ServerURL, task.Method)
-			handlingAny(magenta, message)
-			if err != nil || str == nil {
-				handlingError(err)
-			} else {
-				handlingAny(cyan, *str)
-			}
-		}
+		} (&task)
 	}
 	fmt.Println("")
 }
