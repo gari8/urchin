@@ -1,5 +1,14 @@
 # urchin
 
+## What is this?
+
+A simple client tool made by go.
+
+## What you can do with this
+
+- You could send a request based on your own written urchin.yml file.
+- You could send requests in parallel for each task.
+
 ## How to install
 
 ```
