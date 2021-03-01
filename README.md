@@ -54,3 +54,53 @@ tasks:
 task_interval: 3 #(s)
 max_trial_count: 3
 ```
+
+## Applied usage
+
+- You need to make two requests to the same server many times every 10 seconds.
+query or params
+
+- req1
+```
+user_id: "test_user",
+title: "sql_file_content",
+sql_content: "<content by ./dump.sql file>"
+```
+
+- req2
+```
+user_id: "test_user",
+title: "sql_file_content2",
+sql_content: "<content by ./dump_2.sql file>"
+```
+
+\example
+```
+base: &base
+  server_url: "https://xxx.xxx.jp/api/v1/accepting_req"
+  method: "POST"
+  basic_auth:
+    user_name: "xxx"
+    password: "xxxxxx"
+test_user: &test_user
+  q_name: "user_id"
+  q_body: "test_user"
+tasks:
+  - task_name: "req1"
+    <<: *base
+    queries:
+      - *test_user
+      - q_name: "title"
+        q_body: "sql_file_content"
+      - q_name: "sql_content"
+        q_file: "./dump.sql"
+  - task_name: "req2"
+    <<: *base
+    queries:
+      - *test_user
+      - q_name: "title"
+        q_body: "sql_file_content2"
+      - q_name: "sql_content"
+        q_file: "./dump_2.sql"
+task_interval: 10
+```
