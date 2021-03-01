@@ -61,21 +61,21 @@ max_trial_count: 3
 query or params
 
 - req1
-```
+```bash
 user_id: "test_user",
 title: "sql_file_content",
 sql_content: "<content by ./dump.sql file>"
 ```
 
 - req2
-```
+```bash
 user_id: "test_user",
 title: "sql_file_content2",
 sql_content: "<content by ./dump_2.sql file>"
 ```
 
 \example
-```
+```urchin.yml
 base: &base
   server_url: "https://xxx.xxx.jp/api/v1/accepting_req"
   method: "POST"
