@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"os"
 	"strconv"
+	"sync"
 	"time"
 )
 
@@ -97,34 +98,40 @@ func (c *Content) Work() {
 		return
 	}
 
+	wg := new(sync.WaitGroup)
+
 	if data.TaskInterval != nil {
 		index := 1
 		ticker := time.NewTicker(time.Millisecond * time.Duration(*data.TaskInterval*1000))
 		defer ticker.Stop()
-		taskRunner(data)
+		taskRunner(data, wg)
 		for {
 			select {
 			case <-ticker.C:
-				taskRunner(data)
+				taskRunner(data, wg)
 				index++
 				if data.MaxTrialCnt != nil && index == *data.MaxTrialCnt {
+					wg.Wait()
 					handlingSuccess("Task completed " + strconv.Itoa(index) + " times in total " + "(" + strconv.Itoa(index*(*data.TaskInterval)) + "s)")
 					return
 				}
 			}
 		}
 	} else {
-		taskRunner(data)
+		taskRunner(data, wg)
 	}
+
+	wg.Wait()
 }
 
-func taskRunner(data Data) {
+func taskRunner(data Data, wg *sync.WaitGroup) {
+	wg.Add(len(data.Tasks))
 	fmt.Println("")
 	for _, task := range data.Tasks {
 		handlingAny(magenta, fmt.Sprintf("sent a request to task: %s", task.TaskName))
-		go func (task Task) {
+		go func(task Task) {
 			if task.TrialCnt != nil {
-				for i:=0; i<*task.TrialCnt; i++ {
+				for i := 0; i < *task.TrialCnt; i++ {
 					str, err := task.Exe()
 					message := fmt.Sprintf("task_name: %s, server_url: %s, method: %s", task.TaskName, task.ServerURL, task.Method)
 					handlingAny(magenta, message)
@@ -144,7 +151,8 @@ func taskRunner(data Data) {
 					handlingAny(cyan, *str)
 				}
 			}
-		} (task)
+			wg.Done()
+		}(task)
 	}
 	fmt.Println("")
 }
