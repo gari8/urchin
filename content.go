@@ -85,7 +85,7 @@ func (c *Content) Work() {
 		return
 	}
 
-	buf, err := ioutil.ReadFile(*c.FilePath+"/"+fileName)
+	buf, err := ioutil.ReadFile(*c.FilePath + "/" + fileName)
 	if err != nil {
 		handlingWarning(notExist)
 		return
@@ -128,8 +128,11 @@ func taskRunner(data Data, wg *sync.WaitGroup) {
 	wg.Add(len(data.Tasks))
 	fmt.Println("")
 	for _, task := range data.Tasks {
-		handlingAny(magenta, fmt.Sprintf("sent a request to task: %s", task.TaskName))
 		go func(task Task) {
+			if task.DelayMs != nil {
+				time.Sleep(time.Millisecond * time.Duration(*task.DelayMs))
+			}
+			handlingAny(magenta, fmt.Sprintf("sent a request to task: %s", task.TaskName))
 			if task.TrialCnt != nil {
 				for i := 0; i < *task.TrialCnt; i++ {
 					str, err := task.Exe()
@@ -167,7 +170,7 @@ func (c *Content) Create() {
 	if _, err = file.WriteString(templates); err != nil {
 		handlingError(err)
 	}
-	handlingSuccess("create: "+fileName)
+	handlingSuccess("create: " + fileName)
 }
 
 func (c *Content) Usage() {

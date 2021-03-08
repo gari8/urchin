@@ -12,8 +12,8 @@ import (
 )
 
 const (
-	multi = "multipart/form-data"
-	appJson = "application/json; charset=UTF-8"
+	multi    = "multipart/form-data"
+	appJson  = "application/json; charset=UTF-8"
 	formData = "application/x-www-form-urlencoded; charset=UTF-8"
 )
 
@@ -23,7 +23,9 @@ func (t *Task) Exe() (*string, error) {
 	case http.MethodGet:
 		return t.get()
 	case http.MethodPost:
-		if t.ContentType == nil { return t.postForm() }
+		if t.ContentType == nil {
+			return t.postForm()
+		}
 		if strings.Contains(multi, *t.ContentType) || containsQueryFile(t.Queries) {
 			return t.postMultipart()
 		} else if strings.Contains(appJson, *t.ContentType) {
@@ -47,14 +49,18 @@ func (t *Task) get() (*string, error) {
 	}
 
 	for _, h := range t.Headers {
-		if h == nil { continue }
+		if h == nil {
+			continue
+		}
 		req.Header.Set(*h.HType, *h.HBody)
 	}
 
 	params := req.URL.Query()
 	for _, q := range t.Queries {
 		// GET で upload 禁止
-		if q == nil || q.QFile != nil { continue }
+		if q == nil || q.QFile != nil {
+			continue
+		}
 		params.Add(*q.QName, *q.QBody)
 	}
 
@@ -80,7 +86,9 @@ func fileReader(fileName string) ([]byte, error) {
 func (t *Task) postForm() (*string, error) {
 	values := url.Values{}
 	for _, q := range t.Queries {
-		if q == nil { continue }
+		if q == nil {
+			continue
+		}
 		if q.QFile != nil {
 			byte, err := fileReader(*q.QFile)
 			if err != nil {
@@ -101,7 +109,9 @@ func (t *Task) postForm() (*string, error) {
 	req.Header.Set("Content-Type", formData)
 
 	for _, h := range t.Headers {
-		if h == nil { continue }
+		if h == nil {
+			continue
+		}
 		req.Header.Set(*h.HType, *h.HBody)
 	}
 
@@ -123,7 +133,9 @@ func (t *Task) postJson() (*string, error) {
 	req.Header.Set("Content-Type", appJson)
 
 	for _, h := range t.Headers {
-		if h == nil { continue }
+		if h == nil {
+			continue
+		}
 		req.Header.Set(*h.HType, *h.HBody)
 	}
 
@@ -158,7 +170,9 @@ func (t *Task) postMultipart() (*string, error) {
 	//req.Header.Set("Content-Type", w.FormDataContentType())
 
 	for _, h := range t.Headers {
-		if h == nil { continue }
+		if h == nil {
+			continue
+		}
 		req.Header.Set(*h.HType, *h.HBody)
 	}
 

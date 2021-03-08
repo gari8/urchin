@@ -1,21 +1,22 @@
 package urchin
 
 type Data struct {
-	Tasks []Task `yaml:"tasks"`
-	TaskInterval *int `yaml:"task_interval"`
-	MaxTrialCnt *int `yaml:"max_trial_count"`
+	Tasks        []Task `yaml:"tasks"`
+	TaskInterval *int   `yaml:"task_interval"`
+	MaxTrialCnt  *int   `yaml:"max_trial_count"`
 }
 
 type Task struct {
-	TaskName string `yaml:"task_name"`
-	ServerURL string `yaml:"server_url"`
-	Method string `yaml:"method"`
-	ContentType *string `yaml:"content_type"`
-	TrialCnt *int `yaml:"trial_count"`
-	QJson *string `yaml:"q_json"`
-	BasicAuth *Auth `yaml:"basic_auth"`
-	Queries []*Query `yaml:"queries"`
-	Headers []*Header `yaml:"headers"`
+	TaskName    string    `yaml:"task_name"`
+	ServerURL   string    `yaml:"server_url"`
+	Method      string    `yaml:"method"`
+	ContentType *string   `yaml:"content_type"`
+	TrialCnt    *int      `yaml:"trial_count"`
+	DelayMs     *int      `yaml:"delay_ms"`
+	QJson       *string   `yaml:"q_json"`
+	BasicAuth   *Auth     `yaml:"basic_auth"`
+	Queries     []*Query  `yaml:"queries"`
+	Headers     []*Header `yaml:"headers"`
 }
 
 type Auth struct {
@@ -35,6 +36,6 @@ type Query struct {
 }
 
 type Content struct {
-	SubCmd string
+	SubCmd   string
 	FilePath *string
 }
