@@ -23,6 +23,9 @@ urchin init
 
 // executing program by ./urchin.yml
 urchin work .
+
+// when you want to keep an execution log
+urchin -L work .
 ```
 
 ## How to write
@@ -73,6 +76,7 @@ user_id: "test_user",
 title: "sql_file_content2",
 sql_content: "<content by ./dump_2.sql file>"
 ```
+> condition: !!! req2 is executed one second later than req1 !!!
 
 \example
 ```urchin.yml
@@ -96,6 +100,7 @@ tasks:
         q_file: "./dump.sql"
   - task_name: "req2"
     <<: *base
+    delay_ms: 1000 # Delaying execution in milliseconds
     queries:
       - *test_user
       - q_name: "title"
