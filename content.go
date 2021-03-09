@@ -33,6 +33,9 @@ urchin init
 * executing urchin by your urchin.yml
 urchin work <your urchin.yml path>
 
+* when you want to keep an execution log
+urchin -L work <your urchin.yml path>
+
 * showing this help-message again
 urchin help
 
