@@ -38,4 +38,5 @@ type Query struct {
 type Content struct {
 	SubCmd   string
 	FilePath *string
+	LogMode bool
 }

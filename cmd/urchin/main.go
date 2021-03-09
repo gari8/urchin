@@ -9,6 +9,7 @@ import (
 
 func main() {
 	var content urchin.Content
+	flag.BoolVar(&content.LogMode, "L", false, "add log mode")
 	flag.Parse()
 	content.SubCmd = flag.Arg(0)
 	file := flag.Arg(1)

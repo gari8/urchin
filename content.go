@@ -79,6 +79,15 @@ const (
 	white
 )
 
+func NowJST() string {
+	now := time.Now()
+	nowUTC := now.UTC()
+	jst := time.FixedZone("Asia/Tokyo", 9*60*60)
+	nowJST := nowUTC.In(jst)
+
+	return nowJST.Format(time.RFC3339)
+}
+
 func (c *Content) Work() {
 	if c.FilePath == nil {
 		handlingWarning(notExist)
@@ -104,11 +113,11 @@ func (c *Content) Work() {
 		index := 1
 		ticker := time.NewTicker(time.Millisecond * time.Duration(*data.TaskInterval*1000))
 		defer ticker.Stop()
-		taskRunner(data, wg)
+		c.taskRunner(data, wg)
 		for {
 			select {
 			case <-ticker.C:
-				taskRunner(data, wg)
+				c.taskRunner(data, wg)
 				index++
 				if data.MaxTrialCnt != nil && index == *data.MaxTrialCnt {
 					wg.Wait()
@@ -118,13 +127,31 @@ func (c *Content) Work() {
 			}
 		}
 	} else {
-		taskRunner(data, wg)
+		c.taskRunner(data, wg)
 	}
 
 	wg.Wait()
 }
 
-func taskRunner(data Data, wg *sync.WaitGroup) {
+func (c *Content) addLog(log string) {
+	if !c.LogMode { return }
+	name := "urchin.log"
+	fp, err := os.OpenFile(name, os.O_RDWR|os.O_CREATE|os.O_APPEND, 0664)
+	if err != nil {
+		return
+	}
+	defer fp.Close()
+	_, _ = fmt.Fprintln(fp, log)
+}
+
+func (t *Task) newMessage(str *string) string {
+	if str == nil {
+		return fmt.Sprintf("task_name: %s, server_url: %s, method: %s, date: %s", t.TaskName, t.ServerURL, t.Method, NowJST())
+	}
+	return fmt.Sprintf("task_name: %s, server_url: %s, method: %s, date: %s\n => %s", t.TaskName, t.ServerURL, t.Method, NowJST(), *str)
+}
+
+func (c *Content) taskRunner(data Data, wg *sync.WaitGroup) {
 	wg.Add(len(data.Tasks))
 	fmt.Println("")
 	for _, task := range data.Tasks {
@@ -136,22 +163,28 @@ func taskRunner(data Data, wg *sync.WaitGroup) {
 			if task.TrialCnt != nil {
 				for i := 0; i < *task.TrialCnt; i++ {
 					str, err := task.Exe()
-					message := fmt.Sprintf("task_name: %s, server_url: %s, method: %s", task.TaskName, task.ServerURL, task.Method)
-					handlingAny(magenta, message)
 					if err != nil || str == nil {
-						handlingError(err)
+						m := fmt.Sprintf("%s", err)
+						log := task.newMessage(&m)
+						handlingAny(red, log)
+						c.addLog(log)
 					} else {
-						handlingAny(cyan, *str)
+						log := task.newMessage(str)
+						handlingAny(cyan, log)
+						c.addLog(log)
 					}
 				}
 			} else {
 				str, err := task.Exe()
-				message := fmt.Sprintf("task_name: %s, server_url: %s, method: %s", task.TaskName, task.ServerURL, task.Method)
-				handlingAny(magenta, message)
 				if err != nil || str == nil {
-					handlingError(err)
+					m := fmt.Sprintf("%s", err)
+					log := task.newMessage(&m)
+					handlingAny(red, log)
+					c.addLog(log)
 				} else {
-					handlingAny(cyan, *str)
+					log := task.newMessage(str)
+					handlingAny(cyan, log)
+					c.addLog(log)
 				}
 			}
 			wg.Done()
