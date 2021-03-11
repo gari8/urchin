@@ -37,9 +37,10 @@ tasks:
   - task_name: "" #(*)
     server_url: "" #(*)
     method: "POST" #(*)
+    delay_ms: 1000 # Delaying execution in milliseconds
     trial_count: 2
     content_type: ""
-    # "application/json" or "application/x-www-form-urlencoded", "multipart/form-data" is WIP
+    # "application/json" or "application/x-www-form-urlencoded", "multipart/form-data"
     headers:
       - h_type: ""
         h_body: ""
@@ -51,7 +52,8 @@ tasks:
       - q_name: "" # field_name
         q_body: "" # content
       - q_name: ""
-        q_file: "./a.csv" # reading local file and then sending the content as string
+        q_file: "./a.csv" #("content-type": "application/x-www-form-urlencoded") reading local file and then sending the content as string
+                          #("content-type": "multipart/form-data") uploading local file to your oriented server
     # query pattern ("content-type": "application/json")
     q_json: "{\"user_name\": \"takashi\"}"
 task_interval: 3 #(s)

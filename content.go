@@ -46,29 +46,31 @@ please enter: https://github.com/gari8/urchin
 * getting newer version
 go get -u github.com/gari8/urchin/cmd/urchin
 `
-const templates = `tasks: # must
-  - task_name: "sample" # must
-    server_url: "https://sample.com/xxxx/xxxx" # must
-    method: "POST" # must
-    trial_count: 2 # 1周で送信する回数
-    content_type: "application/json" # content-typeはこちらにかける
-    q_json: "{ \"user_id\": 1 }" # application/json　の場合jsonを書く
-    headers: # header
-      - h_type: # header名 
-        h_body:
-  - task_name: "sample2" # must
-    server_url: "https://sample.com/xxxx/xxxx" # must
-    method: "POST" # must
-    basic_auth: # basic認証
-      user_name: "user_1" # basic_auth がある場合 must
-      password: "******" # basic_auth がある場合 must
+const templates = `tasks:
+  - task_name: "" #(*)
+    server_url: "" #(*)
+    method: "POST" #(*)
+    delay_ms: 1000 # Delaying execution in milliseconds
+    trial_count: 2
+    content_type: ""
+    # "application/json" or "application/x-www-form-urlencoded", "multipart/form-data"
+    headers:
+      - h_type: ""
+        h_body: ""
+    basic_auth:
+      user_name: ""
+      password: "******"
+    # query pattern (not "content-type": "application/json")
     queries:
-      - q_name: "user_id"
-        q_body: "2"
-      - q_name: "title2"
-        q_file: "./index.html" # text file を読み込んで送信
-task_interval: 3 # インターバルの秒数(s)　指定しなければ1周のみ
-max_trial_count: 5 # 合計何周するか　指定しなければ止めるまでループ
+      - q_name: "" # field_name
+        q_body: "" # content
+      - q_name: ""
+        q_file: "./a.csv" #("content-type": "application/x-www-form-urlencoded") reading local file and then sending the content as string
+                          #("content-type": "multipart/form-data") uploading local file to your oriented server
+    # query pattern ("content-type": "application/json")
+    q_json: "{\"user_name\": \"takashi\"}"
+task_interval: 3 #(s)
+max_trial_count: 3
 `
 const boundaryText = "** -------------------- ** boundary ** -------------------- **"
 
