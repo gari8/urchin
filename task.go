@@ -4,7 +4,9 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
+	"io"
 	"io/ioutil"
+	"mime/multipart"
 	"net/http"
 	"net/url"
 	"os"
@@ -13,8 +15,8 @@ import (
 
 const (
 	multi    = "multipart/form-data"
-	appJson  = "application/json; charset=UTF-8"
-	formData = "application/x-www-form-urlencoded; charset=UTF-8"
+	appJson  = "application/json"
+	formData = "application/x-www-form-urlencoded"
 )
 
 func (t *Task) Exe() (*string, error) {
@@ -26,9 +28,9 @@ func (t *Task) Exe() (*string, error) {
 		if t.ContentType == nil {
 			return t.postForm()
 		}
-		if strings.Contains(multi, *t.ContentType) || containsQueryFile(t.Queries) {
+		if strings.Contains(*t.ContentType, multi) {
 			return t.postMultipart()
-		} else if strings.Contains(appJson, *t.ContentType) {
+		} else if strings.Contains(*t.ContentType, appJson) {
 			return t.postJson()
 		} else {
 			return t.postForm()
@@ -144,30 +146,44 @@ func (t *Task) postJson() (*string, error) {
 
 func (t *Task) postMultipart() (*string, error) {
 
-	//TODO
+	body := &bytes.Buffer{}
+	mw := multipart.NewWriter(body)
 
-	//var buf bytes.Buffer
-	//
-	//w := multipart.NewWriter(&buf)
-	//
-	//for _, q := range t.Queries {
-	//	if q.QFile == nil {
-	//		mh := make(textproto.MIMEHeader)
-	//		mh.Set("Content-Type", "text/plain")
-	//		mh.Set("Content-Disposition", "form-data; name=\"file\"; filename=\""+ *q.QFile +"\"")
-	//
-	//
-	//	}
-	//}
-	//
-	//_ = w.Close()
+	for _, q := range t.Queries {
+		if q.QFile != nil && q.QName != nil {
+			file, err := os.Open(*q.QFile)
+			if err != nil {
+				return nil, err
+			}
 
-	req, err := http.NewRequest(t.Method, t.ServerURL, nil)
+			fw, err := mw.CreateFormFile(*q.QName, *q.QFile)
+			_, err = io.Copy(fw, file)
+			if err != nil {
+				return nil, err
+			}
+			_ = file.Close()
+		} else if q.QName != nil && q.QBody != nil {
+			w, err := mw.CreateFormField(*q.QName)
+			if err != nil {
+				return nil, err
+			}
+			_, err = w.Write([]byte(*q.QBody))
+			if err != nil {
+				return nil, err
+			}
+		}
+	}
+
+	contentType := mw.FormDataContentType()
+
+	_ = mw.Close()
+
+	req, err := http.NewRequest(t.Method, t.ServerURL, body)
 	if err != nil {
 		return nil, err
 	}
 
-	//req.Header.Set("Content-Type", w.FormDataContentType())
+	req.Header.Set("Content-Type", contentType)
 
 	for _, h := range t.Headers {
 		if h == nil {
