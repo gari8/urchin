@@ -137,7 +137,9 @@ func (c *Content) Work() {
 }
 
 func (c *Content) addLog(log string) {
-	if !c.LogMode { return }
+	if !c.LogMode {
+		return
+	}
 	name := "urchin.log"
 	fp, err := os.OpenFile(name, os.O_RDWR|os.O_CREATE|os.O_APPEND, 0664)
 	if err != nil {
