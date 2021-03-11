@@ -155,12 +155,12 @@ func (c *Content) addLog(log string) {
 func (t *Task) newMessage(str *string) string {
 	var ct string
 	switch {
+	case t.ContentType == nil:
+		ct = formData
 	case strings.Contains(*t.ContentType, multi):
 		ct = multi
 	case strings.Contains(*t.ContentType, appJson):
 		ct = appJson
-	case t.ContentType == nil:
-		ct = formData
 	}
 	if str == nil {
 		return fmt.Sprintf("[date: %s] [task_name: %s] [server_url: %s] [method: %s] [content-type: %s]", NowJST(), t.TaskName, t.ServerURL, t.Method, ct)
