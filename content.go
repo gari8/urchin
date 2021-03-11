@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"os"
 	"strconv"
+	"strings"
 	"sync"
 	"time"
 )
@@ -150,10 +151,19 @@ func (c *Content) addLog(log string) {
 }
 
 func (t *Task) newMessage(str *string) string {
-	if str == nil {
-		return fmt.Sprintf("task_name: %s, server_url: %s, method: %s, date: %s", t.TaskName, t.ServerURL, t.Method, NowJST())
+	var ct string
+	switch {
+	case strings.Contains(*t.ContentType, multi):
+		ct = multi
+	case strings.Contains(*t.ContentType, appJson):
+		ct = appJson
+	case t.ContentType == nil:
+		ct = formData
 	}
-	return fmt.Sprintf("task_name: %s, server_url: %s, method: %s, date: %s\n => %s", t.TaskName, t.ServerURL, t.Method, NowJST(), *str)
+	if str == nil {
+		return fmt.Sprintf("[date: %s] [task_name: %s] [server_url: %s] [method: %s] [content-type: %s]", NowJST(), t.TaskName, t.ServerURL, t.Method, ct)
+	}
+	return fmt.Sprintf("[date: %s] [task_name: %s] [server_url: %s] [method: %s] [content-type: %s]\n => %s", NowJST(), t.TaskName, t.ServerURL, t.Method, ct, *str)
 }
 
 func (c *Content) taskRunner(data Data, wg *sync.WaitGroup) {
