@@ -40,6 +40,9 @@ urchin -L work <your urchin.yml path>
 * showing this help-message again
 urchin help
 
+* checking if your urchin.yml is in the correct format
+urchin check .
+
 * referring to the website
 please enter: https://github.com/gari8/urchin
 
