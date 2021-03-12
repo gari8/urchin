@@ -231,6 +231,27 @@ func (c *Content) Help() {
 	handlingAny(magenta, helpText)
 }
 
+func (c *Content) Check() {
+	if c.FilePath == nil {
+		handlingWarning(notExist)
+		return
+	}
+
+	buf, err := ioutil.ReadFile(*c.FilePath + "/" + fileName)
+	if err != nil {
+		handlingWarning(notExist)
+		return
+	}
+
+	var data Data
+	if err = yaml.Unmarshal(buf, &data); err != nil {
+		// yml側の問題なのでwarning
+		handlingWarning(invalidFile)
+		return
+	}
+	handlingSuccess("OK, your urchin.yml has passed all the checks")
+}
+
 func handlingError(err error) {
 	fmt.Printf("\x1b[%dm%s\x1b[0m\n", red, err)
 }

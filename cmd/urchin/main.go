@@ -22,6 +22,8 @@ func main() {
 		content.Create()
 	case "help":
 		content.Help()
+	case "check":
+		content.Check()
 	default:
 		content.Usage()
 	}
