@@ -27,7 +27,7 @@ urchin work .
 // when you want to keep an execution log
 urchin -L work .
 
-//　Checking if your urchin.yml is in the correct format
+//　checking if your urchin.yml is in the correct format
 urchin check .
 ```
 
